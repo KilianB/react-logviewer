@@ -1,4 +1,4 @@
-import { List, Range } from "immutable";
+import { List } from "immutable";
 import React, { CSSProperties, Component, Fragment, ReactNode } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { ListChildComponentProps, VariableSizeList } from "react-window";
@@ -345,13 +345,9 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
         const shouldUpdate =
             (nextUrl && nextUrl !== previousUrl) ||
             (nextText && nextText !== previousText);
-
         return {
             scrollToIndex: newScrollToIndex,
-            highlight:
-                previousHighlight === Range(0, 0)
-                    ? getHighlightRange(highlight)
-                    : previousHighlight || getHighlightRange(previousHighlight),
+            highlight: getHighlightRange(highlight),
             ...(shouldUpdate
                 ? {
                       url: nextUrl,
