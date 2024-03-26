@@ -193,7 +193,10 @@ export interface LazyLogProps {
      */
     onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
 
-    onLineOver?: (lineNumber: number) => void;
+    onLineOver?: (
+        lineNumber: number,
+        event: React.MouseEvent<HTMLDivElement>
+    ) => void;
 
     /**
      * Number of rows to render above/below the visible bounds of the list.
