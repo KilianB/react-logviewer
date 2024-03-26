@@ -27,7 +27,7 @@ export interface LineProps {
      * Callback to invoke on click of line contents.
      * @param {React.MouseEvent<HTMLElement>} event - Browser event.
      */
-    onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+    onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>, lineNumber: number): void;
     onLineOver?: (lineNumber: number, event: React.MouseEvent<HTMLDivElement>) => void;
 }
 /**

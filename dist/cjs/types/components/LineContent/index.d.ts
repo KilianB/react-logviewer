@@ -18,7 +18,7 @@ export interface LineContentProps {
     /**
      * Execute a function when the line is clicked.
      */
-    onClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+    onClick?(event: React.MouseEvent<HTMLSpanElement>, lineNumber: number): void;
     /**
      * CSS Style of the LineContent.
      */

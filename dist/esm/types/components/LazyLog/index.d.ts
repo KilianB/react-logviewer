@@ -116,7 +116,9 @@ export interface LazyLogProps {
      * inclusively (e.g. `highlight={[5, 10]}` highlights lines 5-10).
      * This is 1-indexed, i.e. line numbers start at `1`.
      */
-    highlight?: number | number[];
+    highlight?: number | number[] | {
+        lines: number[];
+    };
     /**
      * Specify an additional className to append to highlighted lines.
      */
@@ -151,7 +153,9 @@ export interface LazyLogProps {
      * Is passed a single argument which is an `Immutable.Range`
      * of the highlighted line numbers.
      */
-    onHighlight?: (range: Immutable.Seq.Indexed<number>) => any;
+    onHighlight?: (range: Immutable.Seq.Indexed<number> | {
+        lines: number[];
+    }) => any;
     /**
      * Execute a function if/when the provided `url` has completed loading.
      */
@@ -168,7 +172,7 @@ export interface LazyLogProps {
      * Callback to invoke on click of line contents.
      * @param {React.MouseEvent<HTMLElement>} event - Browser event.
      */
-    onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+    onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>, lineNumber: number): void;
     onLineOver?: (lineNumber: number, event: React.MouseEvent<HTMLDivElement>) => void;
     /**
      * Number of rows to render above/below the visible bounds of the list.
@@ -233,7 +237,9 @@ type LazyLogState = {
     currentResultsPosition: number;
     error?: ErrorStatus;
     filteredLines?: List<Uint8Array>;
-    highlight?: Immutable.Seq.Indexed<number>;
+    highlight?: Immutable.Seq.Indexed<number> | {
+        lines: number[];
+    };
     isFilteringLinesWithMatches: boolean;
     isSearching: boolean;
     lines: List<Uint8Array>;
@@ -264,7 +270,9 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
         loaded?: boolean | undefined;
         error?: null | undefined;
         scrollToIndex: number;
-        highlight: import("immutable").Seq.Indexed<number>;
+        highlight: import("immutable").Seq.Indexed<number> | number[] | {
+            lines: number[];
+        };
     };
     state: LazyLogState;
     emitter: any;

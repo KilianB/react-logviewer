@@ -7120,7 +7120,7 @@ class LineContent extends React.Component {
                 last.text += "\n";
             }
         }
-        return (React__default["default"].createElement("span", { className: `log-content ${styles$a.lineContent}`, style: style, onClick: onClick }, data &&
+        return (React__default["default"].createElement("span", { className: `log-content ${styles$a.lineContent}`, style: style, onClick: (e) => (onClick ? onClick(e, number) : {}) }, data &&
             data.map((part, n) => (React__default["default"].createElement(LinePart, { part: part, format: formatPart, key: `line-${number}-${n}`, enableLinks: this.props.enableLinks })))));
     }
 }
@@ -9998,8 +9998,12 @@ class LazyLog extends React.Component {
             if (!lineNumber) {
                 return;
             }
-            const first = (_a = this.state.highlight) === null || _a === void 0 ? void 0 : _a.first();
-            const last = (_b = this.state.highlight) === null || _b === void 0 ? void 0 : _b.last();
+            let first;
+            let last;
+            if (this.state.highlight && !("lines" in this.state.highlight)) {
+                first = (_a = this.state.highlight.first()) === null || _a === void 0 ? void 0 : _a.valueOf();
+                last = (_b = this.state.highlight.last()) === null || _b === void 0 ? void 0 : _b.valueOf();
+            }
             let range;
             if (first === lineNumber) {
                 range = null;
@@ -10007,10 +10011,10 @@ class LazyLog extends React.Component {
             else if (!e.shiftKey || !first) {
                 range = lineNumber;
             }
-            else if (enableMultilineHighlight && lineNumber > first) {
+            else if (lineNumber > first) {
                 range = [first, lineNumber];
             }
-            else if (!enableMultilineHighlight && lineNumber > first) {
+            else if (lineNumber > first) {
                 range = lineNumber;
             }
             else {
@@ -10189,7 +10193,16 @@ class LazyLog extends React.Component {
             const parsedData = enableLinks
                 ? parseLinks(ansiparse(decodedLine))
                 : ansiparse(decodedLine);
-            return (React__default["default"].createElement(Line, { className: `log-line ${lineClassName}`, data: parsedData, enableGutters: enableGutters, enableLineNumbers: enableLineNumbers, enableLinks: enableLinks, formatPart: this.handleFormatPart(number), gutter: gutter ? gutter[number] : undefined, highlight: highlight === null || highlight === void 0 ? void 0 : highlight.includes(number), highlightClassName: `log-highlight ${highlightLineClassName}`, key: options.index, number: number, rowHeight: rowHeight, selectable: selectableLines, style: options.style, onLineNumberClick: (e) => {
+            let highlightLine = false;
+            if (highlight) {
+                if ("lines" in highlight) {
+                    highlightLine = highlight.lines.includes(number);
+                }
+                else {
+                    highlightLine = highlight.includes(number);
+                }
+            }
+            return (React__default["default"].createElement(Line, { className: `log-line ${lineClassName}`, data: parsedData, enableGutters: enableGutters, enableLineNumbers: enableLineNumbers, enableLinks: enableLinks, formatPart: this.handleFormatPart(number), gutter: gutter ? gutter[number] : undefined, highlight: highlightLine, highlightClassName: `log-highlight ${highlightLineClassName}`, key: options.index, number: number, rowHeight: rowHeight, selectable: selectableLines, style: options.style, onLineNumberClick: (e) => {
                     const highlighted = this.handleHighlight(e);
                     onLineNumberClick === null || onLineNumberClick === void 0 ? void 0 : onLineNumberClick({
                         lineNumber: number,
@@ -10231,7 +10244,10 @@ class LazyLog extends React.Component {
             : getScrollIndex({ follow, scrollToLine, count, offset });
         const shouldUpdate = (nextUrl && nextUrl !== previousUrl) ||
             (nextText && nextText !== previousText);
-        return Object.assign({ scrollToIndex: newScrollToIndex, highlight: getHighlightRange(highlight) }, (shouldUpdate
+        return Object.assign({ scrollToIndex: newScrollToIndex, highlight: typeof highlight === "object" &&
+                Array.isArray(highlight) === false
+                ? highlight
+                : getHighlightRange(highlight) }, (shouldUpdate
             ? {
                 url: nextUrl,
                 text: nextText,
