@@ -23,6 +23,7 @@ const BaseStory = {
     height: "520",
     loadingComponent: undefined,
     onError: undefined,
+    onLineOver: undefined,
     onHighlight: undefined,
     onLineNumberClick: undefined,
     onLoad: undefined,
@@ -89,6 +90,20 @@ export const ClickEvents: Story = {
             onLineContentClick={(e) =>
                 alert(`Line Content: ${e.currentTarget.textContent}`)
             }
+        />
+    ),
+};
+
+export const MouseOverEvents: Story = {
+    args: {
+        ...BaseStory,
+        height: 150,
+        text: `Hover me 100!\nHover me 200!\nHover me 300!\n`,
+    },
+    render: (args) => (
+        <LazyLog
+            {...args}
+            onLineOver={(lineNumber) => alert(`Line No: ${lineNumber}`)}
         />
     ),
 };

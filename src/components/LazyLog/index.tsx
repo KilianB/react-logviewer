@@ -192,6 +192,9 @@ export interface LazyLogProps {
      * @param {React.MouseEvent<HTMLElement>} event - Browser event.
      */
     onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+
+    onLineOver?: (lineNumber: number) => void;
+
     /**
      * Number of rows to render above/below the visible bounds of the list.
      * This can help reduce flickering during scrolling on
@@ -302,6 +305,7 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
         onError: undefined,
         onHighlight: undefined,
         onLineNumberClick: undefined,
+        onLineOver: undefined,
         onLoad: undefined,
         overscanRowCount: 100,
         rowHeight: 19,
@@ -934,6 +938,7 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
             highlightLineClassName,
             onLineNumberClick,
             onLineContentClick,
+            onLineOver,
             gutter,
             enableGutters,
             enableLineNumbers,
@@ -986,6 +991,7 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
                         highlightRange: highlighted,
                     });
                 }}
+                onLineOver={onLineOver}
                 onLineContentClick={onLineContentClick}
             />
         );

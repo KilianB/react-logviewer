@@ -39,6 +39,8 @@ export interface LineProps {
      * @param {React.MouseEvent<HTMLElement>} event - Browser event.
      */
     onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+
+    onLineOver?: (lineNumber: number) => void;
 }
 
 /**
@@ -67,6 +69,7 @@ export default class Line extends Component<LineProps, any> {
             selectable,
             onLineNumberClick,
             onLineContentClick,
+            onLineOver,
             number,
             rowHeight,
             style,
@@ -87,7 +90,13 @@ export default class Line extends Component<LineProps, any> {
         } as CSSProperties;
 
         return (
-            <div className={classes} style={lineStyle}>
+            <div
+                className={classes}
+                style={lineStyle}
+                onMouseOver={() =>
+                    onLineOver ? onLineOver(number as number) : {}
+                }
+            >
                 {this.props.enableLineNumbers ? (
                     <LineNumber
                         number={number}
