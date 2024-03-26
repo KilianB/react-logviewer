@@ -139,7 +139,7 @@ export interface LazyLogProps {
      * inclusively (e.g. `highlight={[5, 10]}` highlights lines 5-10).
      * This is 1-indexed, i.e. line numbers start at `1`.
      */
-    highlight?: number | number[];
+    highlight?: number | number[] | { lines: number[] };
     /**
      * Specify an additional className to append to highlighted lines.
      */
@@ -174,7 +174,9 @@ export interface LazyLogProps {
      * Is passed a single argument which is an `Immutable.Range`
      * of the highlighted line numbers.
      */
-    onHighlight?: (range: Immutable.Seq.Indexed<number>) => any;
+    onHighlight?: (
+        range: Immutable.Seq.Indexed<number> | { lines: number[] }
+    ) => any;
     /**
      * Execute a function if/when the provided `url` has completed loading.
      */
@@ -191,7 +193,10 @@ export interface LazyLogProps {
      * Callback to invoke on click of line contents.
      * @param {React.MouseEvent<HTMLElement>} event - Browser event.
      */
-    onLineContentClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+    onLineContentClick?(
+        event: React.MouseEvent<HTMLSpanElement>,
+        lineNumber: number
+    ): void;
 
     onLineOver?: (
         lineNumber: number,
@@ -261,7 +266,7 @@ type LazyLogState = {
     currentResultsPosition: number;
     error?: ErrorStatus;
     filteredLines?: List<Uint8Array>;
-    highlight?: Immutable.Seq.Indexed<number>;
+    highlight?: Immutable.Seq.Indexed<number> | { lines: number[] };
     isFilteringLinesWithMatches: boolean;
     isSearching: boolean;
     lines: List<Uint8Array>;
@@ -347,7 +352,11 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
             (nextText && nextText !== previousText);
         return {
             scrollToIndex: newScrollToIndex,
-            highlight: getHighlightRange(highlight),
+            highlight:
+                typeof highlight === "object" &&
+                Array.isArray(highlight) === false
+                    ? highlight
+                    : getHighlightRange(highlight),
             ...(shouldUpdate
                 ? {
                       url: nextUrl,
@@ -576,17 +585,23 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
             return;
         }
 
-        const first = this.state.highlight?.first();
-        const last = this.state.highlight?.last();
+        let first: number | undefined;
+        let last: number | undefined;
+
+        if (this.state.highlight && !("lines" in this.state.highlight)) {
+            first = this.state.highlight.first()?.valueOf();
+            last = this.state.highlight.last()?.valueOf();
+        }
+
         let range;
 
         if (first === lineNumber) {
             range = null;
         } else if (!e.shiftKey || !first) {
             range = lineNumber;
-        } else if (enableMultilineHighlight && lineNumber > first) {
+        } else if (lineNumber > first) {
             range = [first, lineNumber];
-        } else if (!enableMultilineHighlight && lineNumber > first) {
+        } else if (lineNumber > first) {
             range = lineNumber;
         } else {
             range = [lineNumber, last];
@@ -967,6 +982,16 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
             ? parseLinks(ansiparse(decodedLine))
             : ansiparse(decodedLine);
 
+        let highlightLine = false;
+
+        if (highlight) {
+            if ("lines" in highlight) {
+                highlightLine = highlight.lines.includes(number);
+            } else {
+                highlightLine = highlight.includes(number);
+            }
+        }
+
         return (
             <Line
                 className={`log-line ${lineClassName}`}
@@ -976,7 +1001,7 @@ export default class LazyLog extends Component<LazyLogProps, LazyLogState> {
                 enableLinks={enableLinks}
                 formatPart={this.handleFormatPart(number)}
                 gutter={gutter ? gutter[number] : undefined}
-                highlight={highlight?.includes(number)}
+                highlight={highlightLine}
                 highlightClassName={`log-highlight ${highlightLineClassName}`}
                 key={options.index}
                 number={number}

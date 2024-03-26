@@ -24,7 +24,10 @@ export interface LineContentProps {
     /**
      * Execute a function when the line is clicked.
      */
-    onClick?(event: React.MouseEvent<HTMLSpanElement>): void;
+    onClick?(
+        event: React.MouseEvent<HTMLSpanElement>,
+        lineNumber: number
+    ): void;
     /**
      * CSS Style of the LineContent.
      */
@@ -65,7 +68,7 @@ export default class LineContent extends Component<LineContentProps, any> {
             <span
                 className={`log-content ${styles.lineContent}`}
                 style={style}
-                onClick={onClick}
+                onClick={(e) => (onClick ? onClick(e, number as number) : {})}
             >
                 {data &&
                     data.map((part: any, n: number) => (
