@@ -1,0 +1,11 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { LazyLog } from "../components";
+declare const meta: Meta<typeof LazyLog>;
+export default meta;
+type Story = StoryObj<typeof LazyLog>;
+export declare const TextLog: Story;
+export declare const URLLog: Story;
+export declare const ClearMethod: Story;
+export declare const ClickEvents: Story;
+export declare const MouseOverEvents: Story;
+export declare const HtmlLinks: Story;
